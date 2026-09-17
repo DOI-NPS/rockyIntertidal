@@ -1,0 +1,8 @@
+^rockyIntertidal\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^temp_scripts$
+^data$
+^logger_scripts$
+^.*\.svg
+^.*\.docx

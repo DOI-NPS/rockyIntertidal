@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+testing_scripts/
+data/
+*.svg
+*.docx
+*.jpg
