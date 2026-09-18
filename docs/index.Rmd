@@ -49,7 +49,8 @@ h4{
 print_head <- function(df){
   knitr::kable(df[1:6,]) |> #, table.attr = "style='width:60%;'") |> 
     kableExtra::kable_classic(full_width = F, font_size = 12, 
-                              bootstrap_options = c("condensed"))
+                              bootstrap_options = c("condensed"))|> 
+    kableExtra::scroll_box(width = "900px")
 }
 library(tidyverse)
 ```
@@ -156,15 +157,6 @@ The package has 4 main types of functions to facilitate working with rocky inter
 <li><b>sum:</b> Most views in the data package also have a summary function that allows you to summarize plot-level data, such as average cover of species by photoplot community type. The get file for that view is used under the hood.</li>
 <li><b>plot:</b> most views also have a plotting function that typically uses the sum function under the hood and visualizes the data for that view. All plotting functions return a ggplot2 object, which means you can usually add ggplot geoms, scales, etc. to them (though note if a scale is already used under the hood, you may not be able to specify another).</li>
 </ul>
-```{r, echo = F, results = 'hide', include = F}
-print_head <- function(df){
-  knitr::kable(df[1:6,]) |> #, table.attr = "style='width:60%;'") |> 
-    kableExtra::kable_classic(full_width = T, font_size = 12, 
-                              bootstrap_options = c("condensed")) |> 
-    kableExtra::scroll_box(width = "1200px")
-}
-
-```
 
 #### Getting help
 <h4><b>Getting (and improving) help</b></h4>
@@ -1250,7 +1242,7 @@ plotWaterTemp(site = "BASHAR", years = 2011:2022)
 
 #### theme_rocky() {.tabset}
 This function customizes a theme for plotting data in the package, including removing the default panel grids from ggplot2 figures.
-```{r fig.alt = get_alt_text(p)}
+```{r fig.alt = get_alt_text(p), fig.height = 4, fig.width = 6}
 dat <- sumPhotoCover(site = "SHIHAR", community = "Ascophyllum", species = "ASCNOD")
 
 library(ggplot2)
