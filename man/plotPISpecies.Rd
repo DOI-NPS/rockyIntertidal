@@ -12,7 +12,6 @@ plotPISpecies(
   palette = c("default"),
   ribbon = FALSE,
   main_groups = FALSE,
-  plotly = FALSE,
   xlab = "Year",
   ylab = "Elevation MLLW (m)",
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
@@ -66,9 +65,6 @@ If FALSE (default), plots points and error bars for each species. Ribbon only wo
 Ascophyllum nodosum (epibionts included), mussels, barnacles, and Crustose non-coraline. If FALSE (Default),
 plots all species or only species specified. If species are specified, this argument will be ignored.}
 
-\item{plotly}{Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-plots a ggplot object.}
-
 \item{xlab}{Quoted text label for x axis. If not specified, defaults to 'Distance (m)'}
 
 \item{ylab}{Quoted text label for y axis. If not specified, defaults to 'Elevation MLLW (m)'}
@@ -99,7 +95,7 @@ The point for each species is the median elevation across the three transects fo
 ribbon represents upper 75\% and lower 25\% elevation recorded for a species within a given year.
 The thicker lines on the error bars are the 25\% and 75\% quantiles of elevation across the transects.
 The thinner error bars that end with vertical lines are the minimum and maximum elevation detected along
-the three transects. Plotting works best with species or community type selected.
+the three transects. .
 }
 \examples{
 \dontrun{

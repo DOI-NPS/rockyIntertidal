@@ -6,7 +6,7 @@
 \usage{
 plotSpeciesContours(
   site = "BASHAR",
-  palette = c("default"),
+  palette = "default",
   xlab = "Distance (m)",
   ylab = "Elevation MLLW (m)",
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
@@ -63,9 +63,9 @@ plotSpeciesContours(site = "OTTPOI")
 plotSpeciesContours(site = "CALISL", include_photoplots = F)
 
 # Other variations
-plotSpeciesContours(site = "CALISL", palette = "default", years = 2019)
+plotSpeciesContours(site = "CALISL", years = 2019)
 
-plotSpeciesContours(site = "BASHAR", palette = "default", years = c(2013, 2018, 2023))
+plotSpeciesContours(site = "BASHAR", years = c(2013, 2018, 2023))
 
 }
 

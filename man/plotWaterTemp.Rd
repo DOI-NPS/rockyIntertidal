@@ -17,7 +17,6 @@ plotWaterTemp(
   years = 2011:as.numeric(format(Sys.Date(), "\%Y")),
   plot_title = NULL,
   facet_col = 1,
-  plotly = FALSE,
   legend_position = "bottom"
 )
 }
@@ -67,9 +66,6 @@ on one figure.}
 
 \item{facet_col}{Numeric. Number of columns for the facet to plot. Defaults to 1.}
 
-\item{plotly}{Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-plots a ggplot object.}
-
 \item{legend_position}{Position of legend. Options are legend.position options in ggplot2. Default is 'bottom'.
 For no legend, specify 'none'.}
 }
@@ -86,7 +82,7 @@ water temperature data derived from importWaterTemp(simplify = TRUE).
 \dontrun{
 
 path <-
-  "Z:/PROJECTS/MONITORING/Rocky_Intertidal/NETN/5_Data/Data_Files/Temperature/Compiled_HT_water_temps_2011-2022/"
+  "./Rocky_Intertidal/NETN/5_Data/Data_Files/Temperature/Compiled_HT_water_temps_2011-2022/"
 importWaterTemp(path, simplify = TRUE, buoy = TRUE) # import water temp and buoy data and simplify to daily stats.
 
 # Default filter returns a plot for BASHAR

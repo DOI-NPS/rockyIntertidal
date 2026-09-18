@@ -12,11 +12,7 @@ plotEchinoCounts(
   palette = c("default"),
   xlab = "Year",
   ylab = "Average Count",
-  main_groups = FALSE,
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
-  nrow = 1,
-  plotly = F,
-  xaxis = TRUE,
   plot_title = NULL,
   QAQC = FALSE,
   drop_missing = TRUE
@@ -59,9 +55,6 @@ Viridis uses a color-blind friendly palette of blues, purples and yellows.}
 
 \item{years}{Filter on year of data collected. Default is 2013 to current year.}
 
-\item{plotly}{Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-plots a ggplot object.}
-
 \item{plot_title}{If specified, plots the title on the figure. If blank, no plot title included.}
 
 \item{QAQC}{Logical. If FALSE (Default), does not return QAQC events. If TRUE,
@@ -73,7 +66,7 @@ Returns a ggplot object of percent cover from photos filtered by function argume
 \description{
 This function plots average counts by species for a given park, site, years and
 species. The point for each species is the median count across the tidepools for that site, year
-and pecies. The error bars are the middle 50\% (lower 25\% and upper 75\% quantiles)
+and species. The error bars are the middle 50\% (lower 25\% and upper 75\% quantiles)
 recorded in tidepools for a species. Note that if more than 1 site is specified,
 the resulting figure will facet on those variables.
 }

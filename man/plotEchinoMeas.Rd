@@ -12,7 +12,6 @@ plotEchinoMeas(
   xlab = "Year",
   ylab = "Length (mm)",
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
-  nrow = 1,
   plot_title = NULL,
   QAQC = FALSE
 )
@@ -52,8 +51,6 @@ the function will warn the user that an unrecognized species was specified in ca
 
 \item{years}{Filter on year of data collected. Default is 2013 to current year.}
 
-\item{nrow}{Number of rows in the heatmap facet. Default is 1. Only used when 1 site is selected.}
-
 \item{plot_title}{If specified, plots the title on the figure. If NULL, no plot title included.}
 
 \item{QAQC}{Logical. If FALSE (Default), does not return QAQC events. If TRUE,
@@ -71,11 +68,11 @@ by year for each specified site, target species photoplot, and species.
 
 importData()
 
-plotEchinoMeas(site = "SHIHAR", years = 2013:2019)
+plotEchinoMeas(site = "OUTBRE", years = 2013:2019)
 
-plotMotileInvertMeas(site = "BASHAR", species = "NUCLAP")
+plotEchinoMeas(site = "BASHAR", species = "STRDRO")
 
-plotMotileInvertMeas(site = "CALISL", species = "LITLIT")
+plotEchinoMeas(park = "ACAD", species = "HENSAN")
 
 
 }

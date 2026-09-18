@@ -9,7 +9,6 @@ plotPhotoCover(
   site = "all",
   plotName = "all",
   species = "all",
-  category = "all",
   community = "all",
   heatmap = FALSE,
   top_spp = NULL,
@@ -19,7 +18,6 @@ plotPhotoCover(
   main_groups = FALSE,
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
   nrow = 1,
-  plotly = FALSE,
   plot_title = NULL,
   QAQC = FALSE,
   drop_missing = TRUE
@@ -58,9 +56,6 @@ that an unrecognized species was specified in case it was an error.
 If a new species is added, the function will warn the user that an unrecognized species was specified
 in case it was an error. The default color palette will also need to be updated, if a new species is added.
 The viridis palette will work with new species without adaptation, but labels will only be species codes.}
-
-\item{category}{Filter on category. Options include:
-c("all", "Genus", "Species", "Species Group", and "Substrate")}
 
 \item{community}{Filter on target species (ie photoplot). Options include:
 c("Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae")}

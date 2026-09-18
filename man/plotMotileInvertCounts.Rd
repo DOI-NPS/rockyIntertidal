@@ -9,16 +9,13 @@ plotMotileInvertCounts(
   site = "all",
   plotName = "all",
   species = "all",
-  category = "all",
   community = "all",
-  top_spp = NULL,
   palette = c("default"),
   xlab = "Year",
   ylab = "Median Count",
   main_groups = FALSE,
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
   nrow = 1,
-  plotly = F,
   xaxis = TRUE,
   plot_title = NULL,
   QAQC = FALSE,
@@ -69,11 +66,7 @@ Viridis uses a color-blind friendly palette of blues, purples and yellows.}
 
 \item{years}{Filter on year of data collected. Default is 2013 to current year.}
 
-\item{plotly}{Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-plots a ggplot object.}
-
-\item{xaxis}{Logical. If TRUE (Default), plots years on x axis. If FALSE, drops x axis.
-FALSE is useful for combining plotly photocover plots in a subplot.}
+\item{xaxis}{Logical. If TRUE (Default), plots years on x axis. If FALSE, drops x axis.}
 
 \item{plot_title}{If specified, plots the title on the figure. If blank, no plot title included.}
 
