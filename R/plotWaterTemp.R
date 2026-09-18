@@ -55,9 +55,6 @@
 #' @param legend_position Position of legend. Options are legend.position options in ggplot2. Default is 'bottom'.
 #' For no legend, specify 'none'.
 #'
-#' @param plotly Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-#' plots a ggplot object.
-#'
 #' @param gam Logical. If FALSE (default), only plots temperature values. If TRUE, plots a trend line
 #' derived from generalize additive modelling. NOT CURRENTLY FUNCTIONAL
 #'
@@ -65,7 +62,7 @@
 #' \dontrun{
 #'
 #' path <-
-#'   "Z:/PROJECTS/MONITORING/Rocky_Intertidal/NETN/5_Data/Data_Files/Temperature/Compiled_HT_water_temps_2011-2022/"
+#'   "./Rocky_Intertidal/NETN/5_Data/Data_Files/Temperature/Compiled_HT_water_temps_2011-2022/"
 #' importWaterTemp(path, simplify = TRUE, buoy = TRUE) # import water temp and buoy data and simplify to daily stats.
 #'
 #' # Default filter returns a plot for BASHAR
@@ -86,12 +83,7 @@ plotWaterTemp <- function(park = "all", site = "all", palette = c('default'),
                           xlab = "Year", ylab = "High Tide Water Temp (F)", gam = FALSE,
                           facet = TRUE, plot_tmin = FALSE, plot_tmax = FALSE,
                           years = 2011:as.numeric(format(Sys.Date(), "%Y")),
-                          plot_title = NULL, facet_col = 1, plotly = FALSE, legend_position = 'bottom'){
-
-
-  if(!requireNamespace("plotly", quietly = TRUE) & plotly == TRUE){
-    stop("Package 'plotly' needed for this function for plotly = TRUE. Please install it or set plotly = FALSE.", call. = FALSE)
-  }
+                          plot_title = NULL, facet_col = 1, legend_position = 'bottom'){
 
   # Match args and class; match.args only checks first match in vector, so have to do it more manually.
   stopifnot(park %in% c("all", "ACAD", "BOHA"))
@@ -179,13 +171,13 @@ plotWaterTemp <- function(park = "all", site = "all", palette = c('default'),
     {if(facet == TRUE) facet_wrap(~SiteCode, labeller = as_labeller(labels), ncol = facet_col)} +
     {if(plot_tmax == TRUE) geom_line(data = ht_tmax, aes(x = timestamp, y = tmax), linetype = 'dashed')} +
     {if(plot_tmin == TRUE) geom_line(data = ht_tmin, aes(x = timestamp, y = tmin), linetype = 'dashed')} +
-    labs(y = ylab, x = xlab, title = plot_title) +
+    labs(y = ylab, x = xlab, title = plot_title, 
+         alt = paste0("Line plot of high tide water temperature for ", 
+                      paste0(SiteCode, collapse = ","), "for the following years: ",
+                      paste0(years, collapse = ","))) +
     theme(legend.position = leg_position,
           axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5))
   )
 
-  pp <-
-  if(plotly == TRUE){plotly::ggplotly(p, tooltip = 'text')} else {p}
-
-  return(pp)
+  return(p)
 }

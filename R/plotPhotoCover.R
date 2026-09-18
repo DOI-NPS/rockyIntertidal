@@ -4,7 +4,6 @@
 #'
 #' @import ggplot2
 #' @importFrom dplyr arrange filter group_by mutate row_number slice_max summarize
-#' @importFrom plotly ggplotly
 #'
 #' @description This function plots median percent cover by species for a given park, site, years and
 #' target species. The point for each species is the median cover across the photoplots that site, year
@@ -50,9 +49,6 @@
 #'
 #' @param community Filter on target species (ie photoplot). Options include:
 #' c("Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae")
-#'
-#' @param category Filter on category. Options include:
-#' c("all", "Genus", "Species", "Species Group", and "Substrate")
 #'
 #' @param main_groups Logical. If TRUE, only plots red algae (combined Irish moss and red algae group), Fucus spp.,
 #' Ascophyllum nodosum, mussels, and barnacles. If FALSE (Default), plots all species or only species specified. If species
@@ -112,11 +108,11 @@
 #' @export
 
 plotPhotoCover <- function(park = "all", site = "all", plotName = "all",
-                           species = 'all', category = "all", community = 'all',
+                           species = 'all', community = 'all',
                            heatmap = FALSE, top_spp = NULL, palette = c('default'),
                            xlab = "Year", ylab = "% Cover", main_groups = FALSE,
                            years = 2013:as.numeric(format(Sys.Date(), "%Y")),
-                           nrow = 1, plotly = FALSE,
+                           nrow = 1,
                            plot_title = NULL, QAQC = FALSE, drop_missing = TRUE){
 
 
@@ -127,13 +123,9 @@ plotPhotoCover <- function(park = "all", site = "all", plotName = "all",
   stopifnot(plotName %in% c("all", "T1", "T2", "T3"))
   stopifnot(class(years) == "numeric" | class(years) == "integer", years >= 2013)
   stopifnot(palette %in% c("default", "viridis"))
-  stopifnot(category %in% c("all", "Genus", "Species", "Species Group", "Substrate"))
   stopifnot(community %in% c('all', "Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae"))
   stopifnot(is.numeric(top_spp) | is.null(top_spp))
   stopifnot(is.logical(heatmap))
-  stopifnot(is.logical(plotly))
-
-  if(plotly == TRUE & heatmap == TRUE){stop("Plotly not enabled for heatmap.")}
 
   spp_list <- c("all", "ALGBRO", "ALGGRE", "ALGRED", "ARTCOR",
                 "ASCEPI", "ASCNOD", "BARSPP", "CHOMAS",
@@ -217,8 +209,8 @@ plotPhotoCover <- function(park = "all", site = "all", plotName = "all",
                 "CALISL" = "Calf Island", "GREISL" = "Green Island", "OUTBRE" = "Outer Brewster")
 
   dat1 <- suppressWarnings(force(sumPhotoCover(park = park, site = site, plotName = plotName,
-                                              category = category, years = years, QAQC = QAQC,
-                                              species = species, community = community))) |>
+                                               years = years, QAQC = QAQC,
+                                               species = species, community = community))) |>
                                  dplyr::filter(!is.na(median_cover))
 
   if(!is.null(top_spp) & main_groups == TRUE){
@@ -284,7 +276,6 @@ plotPhotoCover <- function(park = "all", site = "all", plotName = "all",
 
   p <-
   if(heatmap == FALSE){
-    if(plotly == FALSE){
     ggplot(dat_nz, aes(x = Year, y = median_cover,  color = CoverCode, fill = CoverCode,
                        shape = CoverCode, size = CoverCode)) +
          geom_errorbar(aes(ymin = min_cover, ymax = max_cover), linewidth = 1) +
@@ -307,49 +298,13 @@ plotPhotoCover <- function(park = "all", site = "all", plotName = "all",
          {if(facet_targ == TRUE) facet_wrap(~CommunityType)} +
          scale_x_continuous(breaks = c(unique(dat$Year)))+
          theme_rocky() +
-         labs(y = ylab, x = xlab, title = plot_title)+
+         labs(y = ylab, x = xlab, title = plot_title, 
+              alt = paste0("Plot showing photoplot cover in ", 
+                           paste0(site, collapse = ","), 
+                           " for species: ", paste0(sort(unique(dat_nz$CoverCode)), collapse = ","), 
+                           " and years: ", paste0(years, collapse = ",")))+
          theme(legend.position = 'bottom',
                axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5))
-    } else if(plotly == TRUE){
-      suppressWarnings(
-        ggplot(dat_nz, aes(x = Year, y = median_cover, fill = CoverCode, color = CoverCode,
-                         shape = CoverCode, group = CoverCode)) +
-        geom_ribbon(aes(ymin = q25_cover, ymax = q75_cover, #fill = CoverCode, color = CoverCode,
-                        text = paste0("Upper 75% and lower 25% cover", "<br>",
-                                      "Cover Type: ", CoverType, "<br>")),
-                    alpha = 0.3, linewidth = 0.5) +
-        geom_line(aes(x = Year, y = median_cover, #linewidth = 0.1,
-                      text = paste0("Median cover", "<br>",
-                                    "Cover Type: ", CoverType, "<br>")),
-                  linewidth = 0.5) +
-        geom_point(aes(x = Year, y = median_cover, #size = CoverCode,
-                       text = paste0("Median cover: ", median_cover, "<br>",
-                                     "Cover Type: ", CoverType, "<br>",
-                                     "Year: ", Year, "<br>")),
-                   color = 'black', size = 4) +
-        scale_shape_manual(values = shps, name = "Cover Type", breaks = names(shps),
-                           labels = labels) +
-        # scale_size_manual(values = sz, name = "Species", breaks = names(sz),
-        #                   labels = labels) +
-        facet_wrap(~CommunityType, labeller = as_labeller(targ_labs)) +
-        {if(all(palette == 'default'))
-          scale_color_manual(values = cols, name = "Cover Type",
-                             breaks = names(cols), labels = labels)} +
-        {if(all(palette == 'default'))
-          scale_fill_manual(values = cols, name = "Cover Type",
-                            breaks = names(cols), labels = labels)} +
-        {if(all(palette == 'viridis')) scale_color_viridis_d("Cover Type")}+
-        {if(facet_loc_cat == TRUE) facet_wrap(~CommunityType + SiteCode,
-                                              labeller = as_labeller(c(targ_labs, loc_labs)))} +
-        {if(facet_loc == TRUE) facet_wrap(~SiteCode, labeller = as_labeller(loc_labs))} +
-        {if(facet_targ == TRUE) facet_wrap(~CommunityType, nrow = 1)} +
-        scale_x_continuous(breaks = c(unique(dat$Year)))+
-        #coord_flip() +
-        theme_rocky() +
-        labs(y = ylab, x = xlab, title = plot_title)+
-        theme(legend.position = 'bottom',
-              axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5))
-      )} # end of plotly == T
     } else if(heatmap == TRUE){
       ggplot(dat, aes(x = Year, y = CoverCode,  color = median_cover, fill = median_cover)) +
         geom_tile(color = '#9F9F9F') +
@@ -363,46 +318,14 @@ plotPhotoCover <- function(park = "all", site = "all", plotName = "all",
                             name = "Median % Cover") +
         scale_x_continuous(breaks = c(unique(dat$Year)))+
         ylab(NULL) +
+        labs(alt = paste0("Plot showing photoplot cover in  ", 
+                   paste0(site, collapse = ","), 
+                   " for species: ", paste0(sort(unique(dat_nz$CoverCode)), collapse = ","), 
+                   " and years: ", paste0(years, collapse = ",")))+
         theme_rocky() +
         theme(legend.position = 'bottom')
       }
 
-  if(plotly == TRUE){
-    pp <-
-      plotly::ggplotly(p, tooltip = 'text', layerData = 1, originalData = F)
-
-    spp_mat <- data.frame(unique(dat_nz[, c("CoverCode", "CoverType")]))
-    #--- Simplify plotly traces in legend ---
-    # Get the names of the legend entries
-    pdf <- data.frame(id = seq_along(pp$x$data),
-                      legend_entries = unlist(lapply(pp$x$data, `[[`, "name")))
-    # Extract the group identifier
-    pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
-    # Determine the points based on max number of chars
-    max_char <- max(nchar(pdf$legend_entries))
-    pdf$points <- ifelse(nchar(pdf$legend_entries) == max_char, TRUE, FALSE)
-
-    pdf <- pdf |> group_by(legend_group, points) |>
-      mutate(rank = row_number(),
-             is_first = ifelse(points == TRUE & rank == 1, TRUE, FALSE)) |>
-      data.frame()
-
-    # Add an indicator for the first entry per group
-    pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "CoverCode"))
-
-    for (i in seq_along(pdf$id)) {
-      # Is the layer the first entry of the group?
-      is_first <- pdf$is_first[[i]]
-      # Assign the group identifier to the name and legendgroup arguments
-      pp$x$data[[i]]$name <- pdf$ScientificName[[i]]
-      pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
-      # Show the legend only for the first layer of the group
-      if (!is_first) pp$x$data[[i]]$showlegend <- FALSE
-    }
-
-    } else {pp <- p}
-
-
-  suppressWarnings(pp)
+  suppressWarnings(p)
 
   }

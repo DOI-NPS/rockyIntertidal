@@ -3,7 +3,6 @@
 #' @include sumMotileInvertMeas.R
 #'
 #' @import ggplot2
-#' @importFrom plotly ggplotly
 #'
 #' @description This function plots a heatmap of the distribution of invertebrate size classes in 1 mm increments
 #' by year for each specified site, target species photoplot, and species. To ensure facets are working properly,
@@ -218,7 +217,10 @@ plotMotileInvertMeas <- function(park = "all", site = "all", plotName = "all",
                              name = "Number of Measurments",
                              na.value = 'white') + #,
         scale_x_continuous(breaks = c(unique(dat$Year)))+
-        labs(y = ylab, x = xlab, title = plot_title) +
+        labs(y = ylab, x = xlab, title = plot_title, 
+             alt = paste0("Heat map of motile invertebrates counts by 1mm increments in sites ", 
+                          paste0(site, collapse = ","),
+                          " for years ", paste0(years, collapse = ","))) +
         theme_rocky() +
         theme(legend.position = 'bottom',
               axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +

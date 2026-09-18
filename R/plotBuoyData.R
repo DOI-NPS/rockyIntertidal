@@ -32,15 +32,12 @@
 #'
 #' @param facet_col Numeric. Number of columns for the facet to plot. Defaults to 1.
 #'
-#' @param plotly Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-#' plots a ggplot object. Currently not functional.
-#'
 #'
 #' @examples
 #' \dontrun{
 #'
 #' path <-
-#'   "Z:/PROJECTS/MONITORING/Rocky_Intertidal/NETN/5_Data/Data_Files/Temperature/Compiled_HT_water_temps_2011-2022/"
+#'   "./Rocky_Intertidal/NETN/5_Data/Data_Files/Temperature/Compiled_HT_water_temps_2011-2022/"
 #' importWaterTemp(path, simplify = TRUE, buoy = TRUE) # import water temp and buoy data and simplify to daily stats.
 #'
 #' # Default filter returns a plot of the closest buoys to ACAD and BOHA
@@ -60,7 +57,7 @@
 plotBuoyData <- function(park = "ACAD", palette = c('default'),
                           metric = "all",
                           years = 2011:as.numeric(format(Sys.Date(), "%Y")),
-                          plot_title = NULL, facet_col = 1, plotly = FALSE){
+                          plot_title = NULL, facet_col = 1){
 
   # Match args and class; match.args only checks first match in vector, so have to do it more manually.
   stopifnot(park %in% c("ACAD", "BOHA"))
@@ -71,11 +68,6 @@ plotBuoyData <- function(park = "ACAD", palette = c('default'),
   # if(!requireNamespace("mgcv", quietly = TRUE) & gam == TRUE){
   #   stop("Package 'mgcv' needed for this function to work. Please install it.", call. = FALSE)
   # }
-
-  if(!requireNamespace("plotly", quietly = TRUE) & plotly == TRUE){
-    stop("Package 'plotly' needed for this function for plotly = TRUE. Please install it or set plotly = FALSE.", call. = FALSE)
-  }
-
   env <- if(exists("ROCKY")){ROCKY} else {.GlobalEnv}
 
   # Check for loaded buoy data.
@@ -165,7 +157,6 @@ plotBuoyData <- function(park = "ACAD", palette = c('default'),
                 'Southerly' = '#fdae61',
                 'Westerly' = '#d7191c')
 
-#  if(plotly == FALSE){
   p_wspd <- suppressWarnings(
       ggplot(dat2, aes(x = DATE, y = WSPD_max_mph, color = WDIR_txt)) +
         geom_line(color = cols[3]) +
@@ -179,6 +170,7 @@ plotBuoyData <- function(park = "ACAD", palette = c('default'),
               axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5),
               legend.title = element_text(size = 9)) +
         ylab( "Max. Wind Speed (mph)") + xlab(NULL) +
+        labs(alt = "Line plot of buoy data") +
         scale_color_manual(values = wind_cols, breaks = names(wind_cols), name = "Wind direction") +
         {if(length(years) > 3)
           scale_x_datetime(breaks = scales::breaks_width("6 months"), date_labels = "%m/%y")} +

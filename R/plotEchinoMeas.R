@@ -3,7 +3,6 @@
 #' @include sumEchinoMeas.R
 #'
 #' @import ggplot2
-#' @importFrom plotly ggplotly
 #'
 #' @description This function plots a heatmap of the distribution of invertebrate size classes in 1 mm increments
 #' by year for each specified site, target species photoplot, and species.
@@ -47,18 +46,16 @@
 #'
 #' @param plot_title If specified, plots the title on the figure. If NULL, no plot title included.
 #'
-#' @param nrow Number of rows in the heatmap facet. Default is 1. Only used when 1 site is selected.
-#'
 #' @examples
 #' \dontrun{
 #'
 #' importData()
 #'
-#' plotEchinoMeas(site = "SHIHAR", years = 2013:2019)
+#' plotEchinoMeas(site = "OUTBRE", years = 2013:2019)
 #'
-#' plotMotileInvertMeas(site = "BASHAR", species = "NUCLAP")
+#' plotEchinoMeas(site = "BASHAR", species = "STRDRO")
 #'
-#' plotMotileInvertMeas(site = "CALISL", species = "LITLIT")
+#' plotEchinoMeas(park = "ACAD", species = "HENSAN")
 #'
 #'
 #' }
@@ -71,7 +68,6 @@ plotEchinoMeas <- function(park = "all", site = "all", plotName = "all",
                            species = 'all',
                            xlab = "Year", ylab = "Length (mm)",
                            years = 2013:as.numeric(format(Sys.Date(), "%Y")),
-                           nrow = 1,
                            plot_title = NULL, QAQC = FALSE){
 
 
@@ -174,7 +170,9 @@ plotEchinoMeas <- function(park = "all", site = "all", plotName = "all",
                              name = "Number of Measurments",
                              na.value = 'white') + #,
         scale_x_continuous(breaks = c(unique(dat_full$Year)))+
-        labs(y = ylab, x = xlab, title = plot_title) +
+        labs(y = ylab, x = xlab, title = plot_title,
+             alt = paste0("Plot of echinoderm measurement counts in 1mm increments in sites ", paste0(site, collapse = ","),
+                          " for years ", paste0(years, collapse = ","))) +
         theme_rocky() +
         theme(legend.position = 'bottom',
               axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +

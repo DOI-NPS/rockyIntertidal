@@ -4,7 +4,6 @@
 #'
 #' @import ggplot2
 #' @importFrom dplyr arrange filter group_by slice_max summarize
-#' @importFrom plotly ggplotly
 #'
 #' @description This function plots median count by species for a given park, site, years and
 #' target species. The point for each species is the median count across the photoplots that site, year
@@ -52,9 +51,6 @@
 #' @param QAQC Logical. If FALSE (Default), does not return QAQC events. If TRUE,
 #' returns all events, including QAQC events.
 #'
-#' @param plotly Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-#' plots a ggplot object.
-#'
 #' @param palette Choices are "default" or "viridis". Default assigns logical colors to common species.
 #' Viridis uses a color-blind friendly palette of blues, purples and yellows.
 #'
@@ -63,7 +59,6 @@
 #' @param ylab Quoted text label for y axis. If not specified, defaults to '% Cover'
 #'
 #' @param xaxis Logical. If TRUE (Default), plots years on x axis. If FALSE, drops x axis.
-#' FALSE is useful for combining plotly photocover plots in a subplot.
 #'
 #' @param plot_title If specified, plots the title on the figure. If blank, no plot title included.
 #'
@@ -89,11 +84,11 @@
 #' @export
 
 plotMotileInvertCounts <- function(park = "all", site = "all", plotName = "all",
-                           species = 'all', category = "all", community = 'all',
-                           top_spp = NULL, palette = c('default'),
+                           species = 'all', community = 'all',
+                           palette = c('default'),
                            xlab = "Year", ylab = "Median Count", main_groups = FALSE,
                            years = 2013:as.numeric(format(Sys.Date(), "%Y")),
-                           nrow = 1, plotly = F, xaxis = TRUE,
+                           nrow = 1, xaxis = TRUE,
                            plot_title = NULL, QAQC = FALSE, drop_missing = TRUE){
 
 
@@ -106,10 +101,7 @@ plotMotileInvertCounts <- function(park = "all", site = "all", plotName = "all",
                             "R1", "R2", "R3", "R4", "R5"))
   stopifnot(class(years) == "numeric" | class(years) == "integer", years >= 2013)
   stopifnot(palette %in% c("default", "viridis"))
-  stopifnot(category %in% c("all", "Genus", "Species", "Species Group", "Substrate"))
   stopifnot(community %in% c('all', "Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae"))
-  stopifnot(is.numeric(top_spp) | is.null(top_spp))
-  stopifnot(is.logical(plotly))
   stopifnot(is.logical(xaxis))
   stopifnot(is.numeric(nrow) | is.integer(nrow))
 
@@ -209,7 +201,9 @@ plotMotileInvertCounts <- function(park = "all", site = "all", plotName = "all",
          scale_x_continuous(breaks = c(unique(dat$Year)))+
          #coord_flip() +
          theme_rocky() +
-         labs(y = ylab, x = xlab, title = plot_title) +
+         labs(y = ylab, x = xlab, title = plot_title,
+              alt = paste0("Plot of motile invertebrate count in sites ", paste0(site, collapse = ","),
+                           " for years ", paste0(years, collapse = ","))) +
          {if(xaxis == FALSE) theme(
            legend.position = 'bottom',
            axis.text.x = element_blank(),
@@ -220,37 +214,37 @@ plotMotileInvertCounts <- function(park = "all", site = "all", plotName = "all",
          # guides(color = guide_legend(nrow = 3), shape = guide_legend(nrow = 3),
          #        fill = guide_legend(nrow = 3))
         )
-  if(plotly == TRUE){
-  pp <-
-    plotly::ggplotly(p, tooltip = 'text', layerData = 1, originalData = F)
+#   if(plotly == TRUE){
+#   pp <-
+#     plotly::ggplotly(p, tooltip = 'text', layerData = 1, originalData = F)
+# 
+#   spp_mat <- unique(dat_nz[, c("SpeciesCode", "ScientificName")])
+# 
+#   #--- Simplify plotly traces in legend ---
+#   # Get the names of the legend entries
+#   pdf <- data.frame(id = seq_along(pp$x$data),
+#                     legend_entries = unlist(lapply(pp$x$data, `[[`, "name")))
+#   # Extract the group identifier
+#   pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
+#   # Determine the points based on max number of chars
+#   max_char <- max(nchar(pdf$legend_entries))
+#   pdf$points <- ifelse(nchar(pdf$legend_entries) == max_char, TRUE, FALSE)
+# # Add an indicator for the first entry per group
+#   pdf$is_first1 <- !duplicated(pdf$legend_group[pdf$points == TRUE])
+#   pdf$is_first <- ifelse(pdf$is_first1 == TRUE & pdf$points == TRUE, TRUE, FALSE)
+#   pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "SpeciesCode"))
+# 
+#   for (i in seq_along(pdf$id)) {
+#     # Is the layer the first entry of the group?
+#     is_first <- pdf$is_first[[i]]
+#     # Assign the group identifier to the name and legendgroup arguments
+#     pp$x$data[[i]]$name <- pdf$ScientificName[[i]]
+#     pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
+#     # Show the legend only for the first layer of the group
+#     if (!is_first) pp$x$data[[i]]$showlegend <- FALSE
+#   }
+#   } else {pp <- p}
 
-  spp_mat <- unique(dat_nz[, c("SpeciesCode", "ScientificName")])
-
-  #--- Simplify plotly traces in legend ---
-  # Get the names of the legend entries
-  pdf <- data.frame(id = seq_along(pp$x$data),
-                    legend_entries = unlist(lapply(pp$x$data, `[[`, "name")))
-  # Extract the group identifier
-  pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
-  # Determine the points based on max number of chars
-  max_char <- max(nchar(pdf$legend_entries))
-  pdf$points <- ifelse(nchar(pdf$legend_entries) == max_char, TRUE, FALSE)
-# Add an indicator for the first entry per group
-  pdf$is_first1 <- !duplicated(pdf$legend_group[pdf$points == TRUE])
-  pdf$is_first <- ifelse(pdf$is_first1 == TRUE & pdf$points == TRUE, TRUE, FALSE)
-  pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "SpeciesCode"))
-
-  for (i in seq_along(pdf$id)) {
-    # Is the layer the first entry of the group?
-    is_first <- pdf$is_first[[i]]
-    # Assign the group identifier to the name and legendgroup arguments
-    pp$x$data[[i]]$name <- pdf$ScientificName[[i]]
-    pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
-    # Show the legend only for the first layer of the group
-    if (!is_first) pp$x$data[[i]]$showlegend <- FALSE
-  }
-  } else {pp <- p}
-
-  suppressWarnings(pp)
+  suppressWarnings(p)
 
   }

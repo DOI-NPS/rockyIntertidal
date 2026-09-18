@@ -5,14 +5,13 @@
 #'
 #' @import ggplot2
 #' @importFrom dplyr desc filter group_by left_join mutate summarize ungroup
-#' @importFrom plotly ggplotly
 #'
 #' @description This function plots species by bolt elevation a given park, site, and years.
 #' The point for each species is the median elevation across the three transects for that year. The
 #' ribbon represents upper 75% and lower 25% elevation recorded for a species within a given year.
 #' The thicker lines on the error bars are the 25% and 75% quantiles of elevation across the transects.
 #' The thinner error bars that end with vertical lines are the minimum and maximum elevation detected along
-#' the three transects. Plotting works best with species or community type selected. 
+#' the three transects. . 
 #'
 #' @param park Include data from all parks, or choose one.
 #' \describe{
@@ -34,7 +33,6 @@
 #' \item{"GREISL"}{Green Island, BOHA}
 #' \item{"OUTBRE"}{Outer Brewster, BOHA}
 #' }
-#'
 #'
 #' @param years Filter on year of data collected. Default is 2013 to current year.
 #'
@@ -58,9 +56,6 @@
 #'
 #' @param ribbon Logical. If TRUE plots a min/max ribbon around the median elevation for an individual species.
 #' If FALSE (default), plots points and error bars for each species. Ribbon only works if multiple years are plotted.
-#'
-#' @param plotly Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-#' plots a ggplot object.
 #'
 #' @param facet Logical. If TRUE, will plot species in separate facets. FALSE (default) plots all species
 #' on one figure.
@@ -105,13 +100,12 @@
 #' @export
 
 plotPISpecies <- function(park = "all", site = "all", plotName = "all",
-                                  species = NA, palette = c('default'), ribbon = FALSE,
-                                  main_groups = FALSE, plotly = FALSE,
-                                  xlab = "Year", ylab = "Elevation MLLW (m)",
-                                  years = 2013:as.numeric(format(Sys.Date(), "%Y")),
-                                  facet = FALSE, title = TRUE, rev_axis = TRUE,
-                                  QAQC = FALSE, drop_missing = TRUE){
-
+                          species = NA, palette = c('default'), ribbon = FALSE,
+                          main_groups = FALSE, 
+                          xlab = "Year", ylab = "Elevation MLLW (m)",
+                          years = 2013:as.numeric(format(Sys.Date(), "%Y")),
+                          facet = FALSE, title = TRUE, rev_axis = TRUE,
+                          QAQC = FALSE, drop_missing = TRUE){
 
   # Match args and class; match.args only checks first match in vector, so have to do it more manually.
   stopifnot(park %in% c("all", "ACAD", "BOHA"))
@@ -122,11 +116,6 @@ plotPISpecies <- function(park = "all", site = "all", plotName = "all",
   stopifnot(palette %in% c("default", "viridis"))
   stopifnot(is.logical(facet))
   stopifnot(is.logical(ribbon))
-  stopifnot(is.logical(plotly))
-
-  if(!requireNamespace("plotly", quietly = TRUE) & plotly == TRUE){
-    stop("Package 'plotly' needed for this function for plotly = TRUE. Please install it or set plotly = FALSE.", call. = FALSE)
-  }
 
   if(length(years) == 1 & ribbon == TRUE){
     warning("Must specify at least 2 years to plot a ribbon. Setting ribbon = FALSE and plotting error bars.")
@@ -335,42 +324,45 @@ plotPISpecies <- function(park = "all", site = "all", plotName = "all",
          {if(rev_axis == FALSE) scale_y_continuous(limits = c(min(dat_sum$elev_min), max(dat_sum$elev_max)))} +
          {if(rev_axis == FALSE) scale_x_continuous(breaks = c(unique(dat_sum$Year)))} +
          theme_rocky() +
-         labs(y = ylab, x = xlab, title = ptitle)
+         labs(y = ylab, x = xlab, title = ptitle, 
+              alt = paste0("Plot showing species median elevation with error bars in ", 
+                           paste0(site, collapse = ","), " for years ", 
+                           paste0(years, collapse = ",")))
   )
 
-  if(plotly == TRUE){
-    pp <- plotly::ggplotly(p, tooltip = 'text')#, layerData = 2, originalData = F)
+  # if(plotly == TRUE){
+  #   pp <- plotly::ggplotly(p, tooltip = 'text')#, layerData = 2, originalData = F)
+  # 
+  #   spp_mat <- unique(dat_sum[, c("CoverCode", "CoverType")])
+  # 
+  #   #--- Simplify plotly traces in legend ---
+  #   # Get the names of the legend entries
+  #   pdf <- data.frame(id = seq_along(pp$x$data),
+  #                     legend_entries = unlist(lapply(pp$x$data, `[[`, "name")),
+  #                     mode = unlist(lapply(pp$x$data, `[[`, 'mode')))
+  #   # Extract the group identifier
+  #   pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
+  #   pdf <- pdf |> group_by(legend_group, mode) |>
+  #     mutate(rank = row_number(),
+  #            keep = ifelse(mode == 'markers' & rank == 1, TRUE, FALSE)) |>
+  #     data.frame()
+  #   #pdf$keep <- pdf$mode == 'markers'
+  # 
+  #   pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "CoverCode"))
+  # 
+  #   for (i in seq_along(pdf$id)) {
+  #     # Is the layer the first entry of the group?
+  #     keep <- pdf$keep[[i]]
+  #     # Assign the group identifier to the name and legendgroup arguments
+  #     pp$x$data[[i]]$name <- pdf$CoverType[[i]]
+  #     pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
+  #     # Show the legend only for the first layer of the group
+  #     if(!keep) pp$x$data[[i]]$showlegend <- FALSE
+  #     if(keep) pp$x$data[[i]]$showlegend <- TRUE
+  #   }
+  # 
+  #   } else {pp <- p}
 
-    spp_mat <- unique(dat_sum[, c("CoverCode", "CoverType")])
-
-    #--- Simplify plotly traces in legend ---
-    # Get the names of the legend entries
-    pdf <- data.frame(id = seq_along(pp$x$data),
-                      legend_entries = unlist(lapply(pp$x$data, `[[`, "name")),
-                      mode = unlist(lapply(pp$x$data, `[[`, 'mode')))
-    # Extract the group identifier
-    pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
-    pdf <- pdf |> group_by(legend_group, mode) |>
-      mutate(rank = row_number(),
-             keep = ifelse(mode == 'markers' & rank == 1, TRUE, FALSE)) |>
-      data.frame()
-    #pdf$keep <- pdf$mode == 'markers'
-
-    pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "CoverCode"))
-
-    for (i in seq_along(pdf$id)) {
-      # Is the layer the first entry of the group?
-      keep <- pdf$keep[[i]]
-      # Assign the group identifier to the name and legendgroup arguments
-      pp$x$data[[i]]$name <- pdf$CoverType[[i]]
-      pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
-      # Show the legend only for the first layer of the group
-      if(!keep) pp$x$data[[i]]$showlegend <- FALSE
-      if(keep) pp$x$data[[i]]$showlegend <- TRUE
-    }
-
-    } else {pp <- p}
-
-  suppressWarnings(pp)
+  suppressWarnings(p)
 
   }

@@ -4,11 +4,10 @@
 #'
 #' @import ggplot2
 #' @importFrom dplyr arrange filter group_by mutate summarize
-#' @importFrom plotly ggplotly
 #'
 #' @description This function plots average counts by species for a given park, site, years and
 #' species. The point for each species is the median count across the tidepools for that site, year
-#' and pecies. The error bars are the middle 50% (lower 25% and upper 75% quantiles)
+#' and species. The error bars are the middle 50% (lower 25% and upper 75% quantiles)
 #' recorded in tidepools for a species. Note that if more than 1 site is specified,
 #' the resulting figure will facet on those variables.
 #'
@@ -44,9 +43,6 @@
 #' @param QAQC Logical. If FALSE (Default), does not return QAQC events. If TRUE,
 #' returns all events, including QAQC events.
 #'
-#' @param plotly Logical. If TRUE, converts ggplot object to plotly object and includes tooltips. If FALSE (default),
-#' plots a ggplot object.
-#'
 #' @param palette Choices are "default" or "viridis". Default assigns logical colors to common species.
 #' Viridis uses a color-blind friendly palette of blues, purples and yellows.
 #'
@@ -79,12 +75,11 @@
 #' @export
 
 plotEchinoCounts <- function(park = "all", site = "all", plotName = "all",
-                                   species = 'all',
-                                   palette = c('default'),
-                                   xlab = "Year", ylab = "Average Count", main_groups = FALSE,
-                                   years = 2013:as.numeric(format(Sys.Date(), "%Y")),
-                                   nrow = 1, plotly = F, xaxis = TRUE,
-                                   plot_title = NULL, QAQC = FALSE, drop_missing = TRUE){
+                             species = 'all',
+                             palette = c('default'),
+                             xlab = "Year", ylab = "Average Count", 
+                             years = 2013:as.numeric(format(Sys.Date(), "%Y")),
+                             plot_title = NULL, QAQC = FALSE, drop_missing = TRUE){
 
 
   # Match args and class; match.args only checks first match in vector, so have to do it more manually.
@@ -94,8 +89,7 @@ plotEchinoCounts <- function(park = "all", site = "all", plotName = "all",
   stopifnot(plotName %in% c("all", "X1", "X2", "X3"))
   stopifnot(class(years) == "numeric" | class(years) == "integer", years >= 2013)
   stopifnot(palette %in% c("default", "viridis"))
-  stopifnot(is.logical(plotly))
-
+  
   spp_list <- c("all", "ASTFOR", "ASTRUB", "HENSAN", "STRDRO")
 
   unmatch_spp <- setdiff(species, c(spp_list, NA))
@@ -171,48 +165,52 @@ plotEchinoCounts <- function(park = "all", site = "all", plotName = "all",
       scale_x_continuous(breaks = c(unique(dat$Year)))+
       #coord_flip() +
       theme_rocky() +
-      labs(y = ylab, x = xlab, title = plot_title) +
+      labs(y = ylab, x = xlab, title = plot_title, 
+           alt = paste0("Plot showing the distribution of echinoderm counts in ", 
+                        paste0(site, collapse = ","), 
+                        " for species: ", paste0(sort(unique(dat_nz$ScientificName)), collapse = ","), 
+                        " and years: ", paste0(years, collapse = ","))) +
       theme(axis.text.x = element_text(angle = 45))
     # guides(color = guide_legend(nrow = 3), shape = guide_legend(nrow = 3),
     #        fill = guide_legend(nrow = 3))
   )
 
-  if(plotly == TRUE){
-    pp <-
-      plotly::ggplotly(p, tooltip = 'text', layerData = 1, originalData = F)
+  # if(plotly == TRUE){
+  #   pp <-
+  #     plotly::ggplotly(p, tooltip = 'text', layerData = 1, originalData = F)
+  # 
+  #   spp_mat <- data.frame(SpeciesCode = c("ASTFOR", "ASTRUB", "HENSAN", "STRDRO"),
+  #                         ScientificName =
+  #                           c("A. forbesi (Northern sea star)",
+  #                             "A. rubens (common sea star)",
+  #                             "H. sanguinolenta (blood sea star)",
+  #                             "S. droebachiensis (sea urchin)"))
+  # 
+  #   #--- Simplify plotly traces in legend ---
+  #   # Get the names of the legend entries
+  #   pdf <- data.frame(id = seq_along(pp$x$data),
+  #                     legend_entries = unlist(lapply(pp$x$data, `[[`, "name")))
+  #   # Extract the group identifier
+  #   pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
+  #   # Determine the points based on max number of chars
+  #   max_char <- max(nchar(pdf$legend_entries))
+  #   pdf$points <- ifelse(nchar(pdf$legend_entries) == max_char, TRUE, FALSE)
+  #   # Add an indicator for the first entry per group
+  #   pdf$is_first1 <- !duplicated(pdf$legend_group[pdf$points == TRUE])
+  #   pdf$is_first <- ifelse(pdf$is_first1 == TRUE & pdf$points == TRUE, TRUE, FALSE)
+  #   pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "SpeciesCode"))
+  # 
+  #   for (i in seq_along(pdf$id)) {
+  #     # Is the layer the first entry of the group?
+  #     is_first <- pdf$is_first[[i]]
+  #     # Assign the group identifier to the name and legendgroup arguments
+  #     pp$x$data[[i]]$name <- pdf$Spp_Name[[i]]
+  #     pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
+  #     # Show the legend only for the first layer of the group
+  #     if (!is_first) pp$x$data[[i]]$showlegend <- FALSE
+  #   }
+  # } else {pp <- p}
 
-    spp_mat <- data.frame(SpeciesCode = c("ASTFOR", "ASTRUB", "HENSAN", "STRDRO"),
-                          ScientificName =
-                            c("A. forbesi (Northern sea star)",
-                              "A. rubens (common sea star)",
-                              "H. sanguinolenta (blood sea star)",
-                              "S. droebachiensis (sea urchin)"))
-
-    #--- Simplify plotly traces in legend ---
-    # Get the names of the legend entries
-    pdf <- data.frame(id = seq_along(pp$x$data),
-                      legend_entries = unlist(lapply(pp$x$data, `[[`, "name")))
-    # Extract the group identifier
-    pdf$legend_group <- substr(gsub("[^A-Za-z///]", "", pdf$legend_entries), 1, 6)
-    # Determine the points based on max number of chars
-    max_char <- max(nchar(pdf$legend_entries))
-    pdf$points <- ifelse(nchar(pdf$legend_entries) == max_char, TRUE, FALSE)
-    # Add an indicator for the first entry per group
-    pdf$is_first1 <- !duplicated(pdf$legend_group[pdf$points == TRUE])
-    pdf$is_first <- ifelse(pdf$is_first1 == TRUE & pdf$points == TRUE, TRUE, FALSE)
-    pdf <- dplyr::left_join(pdf, spp_mat, by = c("legend_group" = "SpeciesCode"))
-
-    for (i in seq_along(pdf$id)) {
-      # Is the layer the first entry of the group?
-      is_first <- pdf$is_first[[i]]
-      # Assign the group identifier to the name and legendgroup arguments
-      pp$x$data[[i]]$name <- pdf$Spp_Name[[i]]
-      pp$x$data[[i]]$legendgroup <- pp$x$data[[i]]$name
-      # Show the legend only for the first layer of the group
-      if (!is_first) pp$x$data[[i]]$showlegend <- FALSE
-    }
-  } else {pp <- p}
-
-  suppressWarnings(pp)
+  suppressWarnings(p)
 
 }

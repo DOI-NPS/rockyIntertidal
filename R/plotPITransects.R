@@ -95,7 +95,10 @@ plotPITransects <- function(park = "all", site = "all", plotName = "all",
     ggplot(dat, aes(x = Distance_m, y = Elevation_MLLW_m,
                        group = as.factor(Year), color = as.factor(Year))) +
        geom_line(lwd = 1) +
-       labs(x = xlab, y = ylab, title = ptitle, color = "Year") +
+       labs(x = xlab, y = ylab, title = ptitle, color = "Year", 
+            alt = paste0("Line plot showing elevation contour of specified transects in sites ", 
+                         paste0(site, collapse = ","), " for years ", 
+                         paste0(years, collapse = ","))) +
        {if(length(unique(dat$PlotName)) > 1 & length(unique(dat$SiteCode)) > 1)
            facet_wrap(~SiteCode + PlotName, scales = facet_scales)} +
        {if(length(unique(dat$PlotName)) == 1 & length(unique(dat$SiteCode)) > 1)

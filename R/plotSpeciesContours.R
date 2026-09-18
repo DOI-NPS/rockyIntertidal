@@ -55,9 +55,9 @@
 #' plotSpeciesContours(site = "CALISL", include_photoplots = F)
 #' 
 #' # Other variations
-#' plotSpeciesContours(site = "CALISL", palette = "default", years = 2019)
+#' plotSpeciesContours(site = "CALISL", years = 2019)
 #' 
-#' plotSpeciesContours(site = "BASHAR", palette = "default", years = c(2013, 2018, 2023))
+#' plotSpeciesContours(site = "BASHAR", years = c(2013, 2018, 2023))
 #'
 #' }
 #'
@@ -65,11 +65,10 @@
 #' @return Returns a ggplot object of point intercept and percent cover data filtered by function arguments
 #' @export
 
-plotSpeciesContours <- function(site = "BASHAR",
-                           palette = c('default'),
-                           xlab = "Distance (m)", ylab = "Elevation MLLW (m)",
-                           years = 2013:as.numeric(format(Sys.Date(), "%Y")),
-                           plot_title = TRUE, QAQC = FALSE, include_photoplots = TRUE){
+plotSpeciesContours <- function(site = "BASHAR", palette = 'default',
+                                xlab = "Distance (m)", ylab = "Elevation MLLW (m)",
+                                years = 2013:as.numeric(format(Sys.Date(), "%Y")),
+                                plot_title = TRUE, QAQC = FALSE, include_photoplots = TRUE){
 
 
   # Match args and class; match.args only checks first match in vector, so have to do it more manually.
@@ -79,6 +78,12 @@ plotSpeciesContours <- function(site = "BASHAR",
   stopifnot(palette %in% c("default", "viridis"))
   stopifnot(is.logical(plot_title))
   stopifnot(is.logical(include_photoplots))
+  
+  # Check that suggested package required for this function are installed
+  if(!requireNamespace("patchwork", quietly = TRUE) & include_photoplots == TRUE){
+    stop("Package 'patchwork' needed to include photoplots and legend. Please install it.", call. = FALSE)
+  }
+  
 
   if(length(site) > 1){stop("Multiple sites specified. Function can only plot one site at a time.")}
 
@@ -119,7 +124,7 @@ plotSpeciesContours <- function(site = "BASHAR",
   # Compile photo data
   if(include_photoplots == TRUE){
   photo1 <- suppressWarnings(force(getPhotoCover(site = site, plotName = 'all',
-                                               category = 'all', years = years, QAQC = FALSE,
+                                               years = years, QAQC = FALSE,
                                                species = c("ASCNOD",  "ASCEPI", "BARSPP",
                                                            "FUCSPP", "FUCEPI", "NONCOR",
                                                            "MUSSPP", "ALGRED", "CHOMAS"), #"ALGGRE"),
@@ -270,11 +275,15 @@ plotSpeciesContours <- function(site = "BASHAR",
                       breaks = names(cols), labels = labels) +
    scale_fill_manual(values = cols, name = "Species",
                      breaks = names(cols), labels = labels) +
-   labs(x = "Distance (m)", y = "Elevation MLLW (m)") +
+   labs(x = "Distance (m)", y = "Elevation MLLW (m)",
+        alt = paste0("Plot showing species detections along point intercept transects in ", 
+                     paste0(site, collapse = ","), 
+                     " for species: ", paste0(sort(unique(spdat_smooth$CoverCode)), collapse = ","), 
+                     " and years: ", paste0(years, collapse = ","))) +
    {if(length(years) > 1)facet_wrap(~Year, ncol = 1)} +
    {if(plot_title == TRUE)labs(title = site)} +
    theme(legend.position = 'right', #+
-         plot.margin = unit(c(0, 1.5, 0, 1), 'cm') )
+         plot.margin = unit(c(0, 1.5, 0, 1), 'cm'))
          #legend.margin = margin(r = 1, l = 1, unit = 'cm')) #+
          #legend.box.margin = margin(r = 0.2, l = 0.2, unit = 'cm'))#+
    #ylim(-2, 7) #+
@@ -307,13 +316,14 @@ plotSpeciesContours <- function(site = "BASHAR",
                                   ))
 
   #photo_dist_wide$elev_hor <- max(trsm_dat$elev + pie_size * 1.5)
-  photo_dist_wide$pie_ynudge = photo_dist_wide$elev + photo_dist_wide$dist_nudge
+  photo_dist_wide$pie_ynudge = max(photo_dist_wide$elev, na.rm = T)*(pie_size)/2
   }
+  
   p2 <-
   if(include_photoplots == TRUE){
   p1 +
    geom_scatterpie(data = photo_dist_wide, aes(x = dist_nudge, y = pie_ynudge),
-                   pie_scale = pie_size,
+                   pie_scale = pie_size, 
                    cols = c("ASCNOD", "BARSPP", "FUCSPP", "MUSSPP", "REDGRP")) +
    coord_equal(expand = TRUE) +
    theme(legend.position = 'none')
@@ -335,13 +345,13 @@ plotSpeciesContours <- function(site = "BASHAR",
     #                         #rel_heights = c(10, 1))
     #                         #align = 'hv')
 
-  p <- if(include_photoplots == TRUE){
-    gridExtra::grid.arrange(p2, p_leg, nrow = 2, ncol = 2, 
-                            widths = c(4, 1),
-                            layout_matrix = rbind(c(1,2),
-                                                  c(1,NA)))
+  if(include_photoplots == TRUE){
+    
+    library(patchwork)
+    p2 | p_leg + plot_layout(widths = c(2, 1), heights = c(1, 0.2))
+
    } else {p2}
-  return(p)
+
   #print(p)
 
 }

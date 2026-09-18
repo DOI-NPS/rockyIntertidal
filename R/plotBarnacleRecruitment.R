@@ -120,7 +120,9 @@ plotBarnacleRecruitment <- function(park = "all", site = "all", plotName = "summ
 
       scale_x_continuous(breaks = x_breaks) +
       scale_y_continuous(n.breaks = 10) + #scales::pretty_breaks(n = 10)) +
-      labs(x = NULL, y = "Median Barnacle Count", color = "Plot Type", fill = "Plot Type", title = ptitle)
+      labs(x = NULL, y = "Median Barnacle Count", color = "Plot Type", fill = "Plot Type", title = ptitle,
+           alt = paste0("Plot of median barnacle count in sites ", paste0(site, collapse = ","),
+                        " for years ", paste0(years, collapse = ",")))
 
     return(bp)
 
