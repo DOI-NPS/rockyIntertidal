@@ -9,7 +9,6 @@ sumPhotoCover(
   site = "all",
   plotName = "all",
   species = "all",
-  category = "all",
   community = "all",
   years = 2013:as.numeric(format(Sys.Date(), "\%Y")),
   QAQC = FALSE
@@ -48,9 +47,6 @@ c("all", "ALGBRO",  "ALGGRE", "ALGRED", "ARTCOR", "ASCEPI", "ASCNOD", "BARSPP",
 "OTHINV", "OTHPLA", "OTHSUB", "PALPAL", "PORSPP", "ROCK", "SAND", "TAR",
 "ULVINT", "ULVLAC", "UNIDEN"). If a new species is added, the function will warn the user
 that an unrecognized species was specified in case it was an error.}
-
-\item{category}{Filter on category. Options include:
-c("all", "Genus", "Species", "Species Group", and "Substrate")}
 
 \item{community}{Filter on target species. Options include:
 c("Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae")}

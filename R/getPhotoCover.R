@@ -40,9 +40,6 @@
 #' "ULVINT", "ULVLAC", "UNIDEN"). If a new species is added, the function will warn the user
 #' that an unrecognized species was specified in case it was an error.
 #'
-#' @param category Filter on category. Options include:
-#' c("all", "Genus", "Species", "Species Group", and "Substrate")
-#'
 #' @param community Filter on target community. Options include:
 #' c("Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae")
 #'
@@ -82,8 +79,7 @@
 #' @export
 
 getPhotoCover <- function(park = "all", site = "all", plotName = "all",
-                          species = "all", category = "all",
-                          community = 'all',
+                          species = "all", community = 'all',
                           years = 2013:as.numeric(format(Sys.Date(), "%Y")), QAQC = FALSE,
                           dropNA = T){
 
@@ -105,7 +101,6 @@ getPhotoCover <- function(park = "all", site = "all", plotName = "all",
                    "Check that this wasn't a typo."))
   }
 
-  stopifnot(category %in% c("all", "Genus", "Species", "Species Group", "Substrate"))
   stopifnot(plotName %in% c("all", "A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5",
                             "F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5",
                             "R1", "R2", "R3", "R4", "R5"))
@@ -137,13 +132,7 @@ getPhotoCover <- function(park = "all", site = "all", plotName = "all",
   cov_species <- if(any(species %in% 'all')){ cov_pname
   } else {filter(cov_pname, CoverCode %in% species)}
 
-  cov_targ <- if(any(community %in% "all")){cov_species
-  } else{filter(cov_species, CommunityType %in% community)}
-
-  cov_cat <- if(any(category %in% 'all')){ cov_targ
-  } else {filter(cov_targ, Category %in% category)}
-
-  cov_year <- filter(cov_cat, Year %in% years)
+  cov_year <- filter(cov_species, Year %in% years)
 
   cov_qaqc <- if(QAQC == TRUE){cov_year
   } else {cov_year |> filter(QAQC == FALSE) }

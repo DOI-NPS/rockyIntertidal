@@ -43,9 +43,6 @@
 #' @param community Filter on target species. Options include:
 #' c("Ascophyllum", "Barnacle", "Fucus", "Mussel", "Red Algae")
 #'
-#' @param category Filter on category. Options include:
-#' c("all", "Genus", "Species", "Species Group", and "Substrate")
-#'
 #' @param years Filter on year of data collected. Default is 2013 to current year.
 #' Can specify a vector of years.
 #'
@@ -78,7 +75,7 @@
 #' @export
 
 sumPhotoCover <- function(park = "all", site = "all", plotName = "all",
-                          species = "all", category = "all", community = 'all',
+                          species = "all", community = 'all',
                           years = 2013:as.numeric(format(Sys.Date(), "%Y")), QAQC = FALSE){
 
 
@@ -99,7 +96,6 @@ sumPhotoCover <- function(park = "all", site = "all", plotName = "all",
                    "Check that this wasn't a typo."))
   }
 
-  #stopifnot(category %in% c("all", "Genus", "Species", "Species Group", "Substrate"))
   stopifnot(plotName %in% c("all", "A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5",
                             "F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5",
                             "R1", "R2", "R3", "R4", "R5"))
@@ -108,7 +104,6 @@ sumPhotoCover <- function(park = "all", site = "all", plotName = "all",
 
   cover <- force(getPhotoCover(park = park, site = site, plotName = plotName,
                                species = species, community = community,
-                               category = category,
                                years = years, QAQC = QAQC, dropNA = TRUE))
 
   cover$ScientificName <- ifelse(cover$ScientificName == "NA", cover$CoverType, cover$ScientificName)
