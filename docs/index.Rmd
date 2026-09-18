@@ -1208,25 +1208,25 @@ REDGRP, ASCNOD, FUCSPP, MUSSPP, BARSPP, NONCOR. Photoplot cover is plotted as me
 for each target species plot.
 
 <p class = 'fxn'>Plot Little Hunter all years.</p>
-```{r fig.height = 12, fig.width = 10, fig.alt = get_alt_text(lh_spp)}
+```{r fig.height = 11, fig.width = 6, fig.alt = get_alt_text(lh_spp)}
 lh_spp <- plotSpeciesContours(site = "LITHUN")
 lh_spp
 ```
 
 <p class = 'fxn'>Plot Bass Harbor every 3 years since monitoring began.</p>
-```{r fig.height = 12, fig.width = 10, fig.alt = get_alt_text(bh_spp)}
+```{r fig.height = 4, fig.width = 6, fig.alt = get_alt_text(bh_spp)}
 bh_spp <- plotSpeciesContours(site = "BASHAR", years = seq(2013, as.numeric(format(Sys.Date(), "%Y")), 3))
 bh_spp
 ```
 
 <p class = 'fxn'>Plot Green Island for 2024.</p>
-```{r fig.height = 12, fig.width = 10, fig.alt = get_alt_text(gr_pi)}
+```{r fig.height = 3, fig.width = 6, fig.alt = get_alt_text(gr_pi)}
 gr_pi <- plotSpeciesContours(site = "GREISL", years = 2024)
 gr_pi
 ```
 
 <p class = 'fxn'>Plot Green Island for 2024 without photo plot pies.</p>
-```{r fig.height = 12, fig.width = 10, fig.alt = get_alt_text(gr_pi2)}
+```{r fig.height = 4, fig.width = 6, fig.alt = get_alt_text(gr_pi2)}
 gr_pi2 <- plotSpeciesContours(site = "GREISL", years = 2024, include_photoplots = F)
 gr_pi2
 ```
