@@ -12,7 +12,7 @@
 
 body {
   font-family: "NPSRawlinsonOTTwo","Times New Roman", serif;
-  font-size: 12px;
+  font-size: 16px;
   color: black;
   margin:0 auto;
   /*width:1200px;*/
@@ -22,7 +22,7 @@ body {
 
 p {
   font-family: "NPSRawlinsonOTTwo","Times New Roman", serif;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .indent {
@@ -67,7 +67,7 @@ h4 {
 /* Header font */
 h5 {
   font-family: "FrutigerLTStd-Black","Arial",Arial,sans-serif;
-  font-size:12px;
+  font-size:14px;
   padding:0;
   margin:0;
 }
